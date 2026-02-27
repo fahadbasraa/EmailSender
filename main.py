@@ -11,24 +11,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
 
 # ─── Init ─────────────────────────────────────────────────────────────────────
-# ─── Init ─────────────────────────────────────────────────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-env_path = os.path.join(BASE_DIR, ".env")
-if os.path.exists(env_path):
-    load_dotenv(env_path)
-else:
-    load_dotenv() # Fallback for Vercel environment variables
+load_dotenv() # Vercel handles env vars automatically
 
 logging.basicConfig(
     level=logging.INFO,
@@ -50,10 +36,13 @@ SMTP_SERVER   = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT     = int(os.getenv("SMTP_PORT", 587))
 
 # ─── App ──────────────────────────────────────────────────────────────────────
-limiter = Limiter(key_func=get_remote_address)
+from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="CV Bulk Email Sender", version="2.0.0")
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -62,9 +51,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
-
-templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 # ─── In-memory email log ──────────────────────────────────────────────────────
 email_logs: list[dict] = []
@@ -200,7 +188,6 @@ async def get_logs():
 
 
 @app.post("/api/send-emails")
-@limiter.limit("5/minute")
 async def send_emails(
     request:     Request,
     email_list:  str        = Form(...),
