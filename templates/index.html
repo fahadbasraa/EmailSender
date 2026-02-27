@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Bulk Email Sender</title>
+  <meta name="description" content="Send your CV to multiple employers at once — fast, clean, and professional." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+
+  <!-- ── Background ── -->
+  <div class="bg-base"></div>
+
+  <div class="page-wrapper">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+    <header class="site-header">
+      <div class="logo">
+        <span class="logo-icon">✉</span>
+        <span class="logo-text">CV<span class="accent">Blast</span></span>
+      </div>
+      <p class="tagline">Send your CV to every opportunity — in one click.</p>
+    </header>
+
+    <!-- ══ MAIN CARD ════════════════════════════════════════════════════════ -->
+    <main>
+      <div class="card" id="mainCard">
+
+        <!-- Step indicator -->
+        <div class="steps" id="steps">
+          <div class="step active" data-step="1">
+            <span class="step-num">1</span><span class="step-label">Upload CV</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <span class="step-num">2</span><span class="step-label">Recipients</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <span class="step-num">3</span><span class="step-label">Message</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="4">
+            <span class="step-num">4</span><span class="step-label">Send</span>
+          </div>
+        </div>
+
+        <form id="emailForm" enctype="multipart/form-data" novalidate>
+
+          <!-- ── STEP 1 · CV Upload ─────────────────────────────────────── -->
+          <section class="form-section active" id="section-1">
+            <h2 class="section-title">Upload Your CV</h2>
+            <p class="section-hint">PDF only · Maximum 5 MB</p>
+
+            <label class="file-drop-zone" id="dropZone" for="cvFile">
+              <input type="file" id="cvFile" name="cv_file" accept=".pdf" hidden />
+              <div class="drop-icon" aria-hidden="true">📄</div>
+              <p class="drop-primary">Drag &amp; drop your PDF here</p>
+              <p class="drop-secondary">or <span class="link-text">browse files</span></p>
+              <div class="file-selected" id="fileInfo" hidden>
+                <span class="file-name" id="fileName"></span>
+                <span class="file-size" id="fileSize"></span>
+                <button type="button" class="remove-file" id="removeFile" aria-label="Remove file">✕</button>
+              </div>
+            </label>
+
+            <div class="section-nav">
+              <button type="button" class="btn btn-primary" id="next1">Next →</button>
+            </div>
+          </section>
+
+          <!-- ── STEP 2 · Recipients ────────────────────────────────────── -->
+          <section class="form-section" id="section-2">
+            <h2 class="section-title">Recipients</h2>
+            <p class="section-hint">Paste emails separated by commas, semicolons, or new lines — or upload a CSV.</p>
+
+            <div class="field">
+              <label class="field-label" for="emailList">Email Addresses</label>
+              <textarea id="emailList" name="email_list" class="field-input field-textarea"
+                placeholder="hello@company.com, hr@startup.io&#10;recruiter@firm.com" rows="6" required></textarea>
+              <div class="email-counter">
+                <span id="emailCount">0</span> recipient(s) detected
+              </div>
+            </div>
+
+            <div class="csv-upload-row">
+              <span class="csv-or">or upload CSV</span>
+              <label class="btn btn-outline btn-sm" for="csvFile">
+                📋 Choose CSV
+                <input type="file" id="csvFile" accept=".csv" hidden />
+              </label>
+            </div>
+
+            <div class="section-nav">
+              <button type="button" class="btn btn-ghost" id="back2">← Back</button>
+              <button type="button" class="btn btn-primary" id="next2">Next →</button>
+            </div>
+          </section>
+
+          <!-- ── STEP 3 · Message ───────────────────────────────────────── -->
+          <section class="form-section" id="section-3">
+            <h2 class="section-title">Compose Message</h2>
+
+            <div class="field">
+              <label class="field-label" for="senderName">Your Name <span
+                  class="field-optional">(optional)</span></label>
+              <input type="text" id="senderName" name="sender_name" class="field-input" placeholder="Jane Smith" />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="subject">Subject <span class="field-required">*</span></label>
+              <input type="text" id="subject" name="subject" class="field-input"
+                placeholder="Application for Software Engineer Position" required />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="message">Message Body <span class="field-required">*</span></label>
+              <textarea id="message" name="message" class="field-input field-textarea"
+                placeholder="Dear Hiring Manager,&#10;&#10;I am writing to express my interest in..." rows="8"
+                required></textarea>
+              <div class="char-counter"><span id="charCount">0</span> characters</div>
+            </div>
+
+            <div class="section-nav">
+              <button type="button" class="btn btn-ghost" id="back3">← Back</button>
+              <button type="button" class="btn btn-primary" id="next3">Next →</button>
+            </div>
+          </section>
+
+          <!-- ── STEP 4 · Review & Send ─────────────────────────────────── -->
+          <section class="form-section" id="section-4">
+            <h2 class="section-title">Review &amp; Send</h2>
+
+            <div class="review-grid" id="reviewGrid">
+              <!-- populated by JS -->
+            </div>
+
+            <div class="send-zone">
+              <button type="submit" class="btn btn-send" id="sendBtn">
+                <span class="btn-text">🚀 Send CV to All Recipients</span>
+                <span class="btn-loader" hidden>Sending…</span>
+              </button>
+              <p class="send-note">Emails are sent one-by-one with a 2-second delay.</p>
+            </div>
+
+            <div class="section-nav">
+              <button type="button" class="btn btn-ghost" id="back4">← Back</button>
+            </div>
+          </section>
+
+        </form><!-- /emailForm -->
+
+        <!-- ── RESULT PANEL ─────────────────────────────────────────────── -->
+        <div class="result-panel" id="resultPanel" hidden>
+          <div class="result-icon" id="resultIcon">✅</div>
+          <h2 class="result-title" id="resultTitle">All Done!</h2>
+          <p class="result-subtitle" id="resultSubtitle"></p>
+
+          <div class="stats-row" id="statsRow">
+            <div class="stat-box stat-sent">
+              <span class="stat-num" id="statSent">0</span>
+              <span class="stat-label">Sent</span>
+            </div>
+            <div class="stat-box stat-failed">
+              <span class="stat-num" id="statFailed">0</span>
+              <span class="stat-label">Failed</span>
+            </div>
+            <div class="stat-box stat-total">
+              <span class="stat-num" id="statTotal">0</span>
+              <span class="stat-label">Total</span>
+            </div>
+          </div>
+
+          <div class="invalid-notice" id="invalidNotice" hidden>
+            <strong>⚠ Skipped (invalid format):</strong>
+            <span id="invalidList"></span>
+          </div>
+
+          <button type="button" class="btn btn-primary" id="sendAnother">↩ Send Another</button>
+        </div>
+
+      </div><!-- /card -->
+
+      <!-- ══ LOG TABLE ═══════════════════════════════════════════════════════ -->
+      <section class="log-section" id="logSection">
+        <div class="log-header">
+          <h2 class="log-title">📋 Delivery Log</h2>
+          <button class="btn btn-outline btn-sm" id="refreshLog">⟳ Refresh</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="log-table" id="logTable">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Status</th>
+                <th>File</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+              <tr class="log-empty">
+                <td colspan="4">No emails sent yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>Built with <span class="accent">FastAPI</span> &amp; <span class="accent">SMTP</span> · Emails sent
+        securely one-by-one</p>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
+  <script src="/static/app.js"></script>
+</body>
+
+</html>
